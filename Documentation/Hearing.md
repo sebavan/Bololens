@@ -12,7 +12,7 @@ The Hearing is represented in Untiy by the BotHearingManager.cs behaviour.
 ## Configuration
 ![Configuration](Pictures/Hearing.png)
 
-1. **Built In Type**: chose amongst the different allowed built in type of supported speech to text API.
+1. **Built In Type**: chose amongst the different built in supported speech to text APIs.
 2. **Custom Caracteristic**: you can specify you own behaviour by extending the BaseBotHearing and referencing the game object hosting your capability here.
 3. **Silence Timeout In Seconds**: time to wait before timing out if no speech have been pronounced.
 

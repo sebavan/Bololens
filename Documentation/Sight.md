@@ -12,5 +12,5 @@ The Sight is represented in Untiy by the BotSightManager.cs behaviour.
 ## Configuration
 ![Configuration](Pictures/Sight.png)
 
-1. **Built In Type**: chose amongst the different allowed built in type of supported camera capture API.
+1. **Built In Type**: chose amongst the different allowed built in camera capture APIs.
 2. **Custom Caracteristic**: you can specify you own behaviour by extending the BaseBotSight and referencing the game object hosting your capability here.

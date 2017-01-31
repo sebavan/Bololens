@@ -12,7 +12,7 @@ The Materialisation is represented in Untiy by the BotMaterialisationManager.cs 
 ## Configuration
 ![Configuration](Pictures/Materialisation.png)
 
-1. **Body Type**: chose amongst the different allowed built in type of body.
+1. **Body Type**: chose amongst the different built in bodies.
 2. **Custom Body**: you can specify you own behaviour by simply dragging in a GameObject. This will then be used as your bot representation (Please read the detail section for more information)
 3. **Custom Positioning**: drop in a game object containing a behaviour inheriting from BaseBotMaterialisationPositioning.cs. The Position method of this component will then be called in order to let you position the body of the body during the "spawining" phase. This can be usefull to interact with spatial mapping or chosing the desired loaction in your scene.
 4. **Enable Feedback**: the feedback panel providing connectivity information can be easily hidden by disabling this parameter. 

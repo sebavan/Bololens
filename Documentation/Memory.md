@@ -12,5 +12,5 @@ The Memory is represented in Untiy by the BotMemoryManager.cs behaviour.
 ## Configuration
 ![Configuration](Pictures/Memory.png)
 
-1. **Built In Type**: chose amongst the different allowed built in type of supported memory.
+1. **Built In Type**: chose amongst the different built in types of supported memory.
 2. **Custom Caracteristic**: you can specify you own behaviour by extending the BaseBotMemory and referencing the game object hosting your capability here.

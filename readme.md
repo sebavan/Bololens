@@ -42,7 +42,7 @@ As the bot personnification is trying to mimic Natural User interactions, *His* 
 4. [Limitations](Documentation/Limitations.md)
 
 ## Conclusion
-A simple proof of Concept where you might find reusable component to build your own Unity Bot Client.
+A simple proof of Concept where you might find reusable components to build your own Unity Bot Client.
 
 <p align="center">
   <img src="Documentation/Pictures/Bot.png">

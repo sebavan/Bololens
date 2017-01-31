@@ -4,7 +4,7 @@ Extensibility
 ## Summary
 All of the bot caracteristic have been developped with extensibility in mind. Two paths for extension are available in most of the component (except for the brain who orchestrates the other ones). Before introducing the different configuration ways, let's take a closer look ar the caracteristics and their managers.
 
-![Personality](Documentation/Pictures/Personality.png)
+![Personality](Pictures/Personality.png)
 
 ## Base Caracteristic
 Each caracteristic is creating from an abstract base caracteristic. This level of abastraction helps implementing decoupled version of the caracteristics. One could think of text to speech being represented either by the UWP one in the application or by a simple log in the editor. Going further it would be easy to add a new Bing based one if we need without having to code back the entire application.

@@ -10,7 +10,7 @@ Hearing
 The Hearing is represented in Untiy by the BotHearingManager.cs behaviour.
 
 ## Configuration
-![Configuration](Documentation/Pictures/Hearing.png)
+![Configuration](Pictures/Hearing.png)
 
 1. Built In Type: chose amongst the different allowed built in type of supported speech to text API.
 2. Custom Caracteristic: you can specify you own behaviour by extending the BaseBotHearing and referencing the game object hosting your capability here.

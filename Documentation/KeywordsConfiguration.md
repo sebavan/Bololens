@@ -8,7 +8,7 @@ A few keywords are necessary to first display and hide your bot also to take pic
 All the keywords can be configured on the [Brain](Brain.md) component of the bot.
 
 ## Configuration
-![Configuration](Documentation/Pictures/Brain.png)
+![Configuration](Pictures/Brain.png)
 
 1. Activation Keywords: a list of keywords to listen to in order to activate (materialize) the bot.
 2. Desactivation Keyword: the keyword the bot is listening in order to stop the conversation.

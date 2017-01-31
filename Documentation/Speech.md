@@ -10,7 +10,7 @@ Speech
 The Speech is represented in Untiy by the BotSpeechManager.cs behaviour.
 
 ## Configuration
-![Configuration](Documentation/Pictures/Speech.png)
+![Configuration](Pictures/Speech.png)
 
 1. Built In Type: chose amongst the different allowed built in type of supported Text to Speech API.
 2. Custom Caracteristic: you can specify you own behaviour by extending the BaseBotSpeech and referencing the game object hosting your capability here.

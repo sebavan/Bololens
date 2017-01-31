@@ -11,7 +11,7 @@ Brain
 The brain is represented in Untiy by the BotBrain.cs behaviour.
 
 ## Configuration
-![Configuration](Documentation/Pictures/Brain.png)
+![Configuration](Pictures/Brain.png)
 
 1. Url Or Token: you can either input here the token of your bot or the url of a service delivering a token when called. The service will be called without authentication and should return a JSON formatted like this { "Token": "abc", "Expires_In": <ExpirationInSeconds> }.
 2. Activation Keywords: a list of keywords to listen to in order to activate (materialize) the bot.

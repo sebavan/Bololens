@@ -10,7 +10,7 @@ Materialisation
 The Materialisation is represented in Untiy by the BotMaterialisationManager.cs behaviour.
 
 ## Configuration
-![Configuration](Documentation/Pictures/Materialisation.png)
+![Configuration](Pictures/Materialisation.png)
 
 1. Body Type: chose amongst the different allowed built in type of body.
 2. Custom Body: you can specify you own behaviour by simply dragging in a GameObject. This will then be used as your bot representation (Please read the detail section for more information)

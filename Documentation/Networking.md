@@ -10,7 +10,7 @@ Networking
 The Networking is represented in Untiy by the BotNetworkingManager.cs behaviour.
 
 ## Configuration
-![Configuration](Documentation/Pictures/Networking.png)
+![Configuration](Pictures/Networking.png)
 
 1. Built In Type: chose amongst the different allowed built in type of supported networking API.
 2. Custom Caracteristic: you can specify you own behaviour by extending the BaseBotNetworking and referencing the game object hosting your capability here.

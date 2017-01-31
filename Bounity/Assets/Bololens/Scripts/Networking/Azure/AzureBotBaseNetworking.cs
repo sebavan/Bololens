@@ -352,6 +352,9 @@ namespace Bololens.Networking.Azure
                 }
             }
 
+            // Defer one frame.
+            yield return null;
+
             // Stops or restart polling messages
             if (willStopPollingOnNextCall)
             {
@@ -378,7 +381,7 @@ namespace Bololens.Networking.Azure
         /// <returns>
         /// The IEnumerator allowing coroutines
         /// </returns>
-        private IEnumerator ParseMessage(ConversationActivity message, UnityWebRequest request)
+        protected virtual IEnumerator ParseMessage(ConversationActivity message, UnityWebRequest request)
         {
             // Simple message.
             if (message.attachments == null || message.attachments.Length == 0)

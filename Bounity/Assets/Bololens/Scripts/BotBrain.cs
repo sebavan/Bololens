@@ -325,19 +325,23 @@ namespace Bololens
             {
                 memory.Delete(BOTFEELINGSMEMORYKEY);
                 personality.ResetFeelings();
+                hearing.ListenForDictation();
             }
             else if (string.Compare(e.Text, TakePictureKeyword, StringComparison.OrdinalIgnoreCase) == 0)
             {
+                hearing.StopListening();
                 sight.CapturePicture(false);
                 // Do not start listening now as it is async. This is done once the screenshot is captured.
             }
             else if (string.Compare(e.Text, TakeHolographicPictureKeyword, StringComparison.OrdinalIgnoreCase) == 0)
             {
+                hearing.StopListening();
                 sight.CapturePicture(true);
                 // Do not start listening now as it is async. This is done once the screenshot is captured.
             }
             else
             {
+                hearing.StopListening();
                 networking.SendTextMessage(e.Text);
                 StartReadingMessages();
             }
@@ -414,7 +418,6 @@ namespace Bololens
 
             // Stops current actions.
             networking.StopReadingMessages();
-            hearing.StopListening();
 
             // Compute new feeling.
             CombineFeeling(e.Feeling, e.FeelingQuantity);

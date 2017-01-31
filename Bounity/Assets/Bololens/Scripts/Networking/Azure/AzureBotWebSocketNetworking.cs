@@ -87,7 +87,7 @@ namespace Bololens.Networking.Azure
             WebSocket.OnMessage -= WebSocket_OnMessage;
             WebSocket.OnClose -= WebSocket_OnClose;
             WebSocket.OnError -= WebSocket_OnError;
-            
+
             // Retry to connect on close.
             currentWebSocketData.Clear();
 
@@ -159,6 +159,22 @@ namespace Bololens.Networking.Azure
                 var message = currentWebSocketData.Pop();
                 yield return OnPollMessagesResult(message, null);
             }
+        }
+
+        /// <summary>
+        /// Parses the conversation message.
+        /// </summary>
+        /// <param name="message">The message from the bot framework to parse.</param>
+        /// <param name="request">The web request associated.</param>
+        /// <returns>
+        /// The IEnumerator allowing coroutines
+        /// </returns>
+        protected override IEnumerator ParseMessage(ConversationActivity message, UnityWebRequest request)
+        {
+            // TODO. Deals with more than the latest message.
+            currentWebSocketData.Clear();
+
+            return base.ParseMessage(message, request);
         }
 
         /// <summary>

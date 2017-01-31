@@ -2,9 +2,9 @@ Materialisation
 ===============
 
 ## Summary
-**From Wikipedia:** *In spiritualism, paranormal literature and some religions, materialization (or manifestation) is the creation or appearance of matter from unknown sources. The existence of materialization has not been confirmed by laboratory experiments. Numerous cases of fraudulent materialization demonstrations by mediums have been exposed.*
+**From Wikipedia**: *In spiritualism, paranormal literature and some religions, materialization (or manifestation) is the creation or appearance of matter from unknown sources. The existence of materialization has not been confirmed by laboratory experiments. Numerous cases of fraudulent materialization demonstrations by mediums have been exposed.*
 
-**From us:** The materialisation is the digital appearance of the bot. It groups the 3D Assets, animations as well as the message and feedback panels available in the bot. 
+**Bololens**: The materialisation is the digital appearance of the bot. It groups the 3D Assets, animations as well as the message and feedback panels available in the bot. 
 
 ## Unity
 The Materialisation is represented in Untiy by the BotMaterialisationManager.cs behaviour.
@@ -12,10 +12,10 @@ The Materialisation is represented in Untiy by the BotMaterialisationManager.cs 
 ## Configuration
 ![Configuration](Pictures/Materialisation.png)
 
-1. Body Type: chose amongst the different allowed built in type of body.
-2. Custom Body: you can specify you own behaviour by simply dragging in a GameObject. This will then be used as your bot representation (Please read the detail section for more information)
-3. Custom Positioning: drop in a game object containing a behaviour inheriting from BaseBotMaterialisationPositioning.cs. The Position method of this component will then be called in order to let you position the body of the body during the "spawining" phase. This can be usefull to interact with spatial mapping or chosing the desired loaction in your scene.
-4. Enable Feedback: the feedback panel providing connectivity information can be easily hidden by disabling this parameter. 
+1. **Body Type**: chose amongst the different allowed built in type of body.
+2. **Custom Body**: you can specify you own behaviour by simply dragging in a GameObject. This will then be used as your bot representation (Please read the detail section for more information)
+3. **Custom Positioning**: drop in a game object containing a behaviour inheriting from BaseBotMaterialisationPositioning.cs. The Position method of this component will then be called in order to let you position the body of the body during the "spawining" phase. This can be usefull to interact with spatial mapping or chosing the desired loaction in your scene.
+4. **Enable Feedback**: the feedback panel providing connectivity information can be easily hidden by disabling this parameter. 
 
 ## Details
 In order to implement your own visualisation, the game object you will drag in the Custom Body field needs to follow a few rules:

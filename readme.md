@@ -8,7 +8,9 @@ This repo provides a nice and easy integration of Chat Bot Clients in Unity appl
 
 As bots and Conversation as a Platform are addressing a new way of interacting through Natural UI, it sounds obvious that bots could have a Digital Identity and Representation. What could be better than Mixed Reality to address the issue? 
 
-The only currently supported bot framework is the [Microsoft Bot framework](https://dev.botframework.com/)
+As we are working in Unity you can find the main project under the BoUnity folder (Bot + Unity = ...)
+
+The only currently supported bot framework is the [Microsoft Bot framework](https://dev.botframework.com/) with the know following [Limitations](Documentation/Limitations.md). 
 
 ## TL;DR
 1. Import the entire content from the **bololens.unitypackage** from the Dist folder in your Unity application.

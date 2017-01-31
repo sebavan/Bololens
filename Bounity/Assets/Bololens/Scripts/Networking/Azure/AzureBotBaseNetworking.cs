@@ -402,7 +402,8 @@ namespace Bololens.Networking.Azure
             }
             else if (attachment.contentType.StartsWith("image"))
             {
-                return LoadAttachmentImage(attachment.content.ToString(), attachment.contentUrl, message.text);
+                var content = attachment.content == null ? null : attachment.content.ToString();
+                return LoadAttachmentImage(content, attachment.contentUrl, message.text);
             }
 
             // Fallback attachment behaviour.

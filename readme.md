@@ -15,9 +15,9 @@ The only currently supported bot framework is ():
 1. Import the entire content from the **bololens.unitypackage** from the Dist folder in your Unity application.
 2. Drag the **Bololens Prefab** from the Bololens/Prefabs folder in your scene.
 3. Customize the **Url or Token** from the BotBrain component to either your Bot Token or a service emitting tokens.
-![UrlOrToken](blob/master/Documentation/Pictures/UrlOrToken.png)
+![UrlOrToken](Documentation/Pictures/UrlOrToken.png)
 4. Customize your **action keywords** like Activation and Desactivation in the bot brain component.
-![Keywords](blob/master/Documentation/Pictures/Keywords.png)
+![Keywords](Documentation/Pictures/Keywords.png)
 5. Run in the editor. As Text To Speech and Speech To Text are not available in the editor, you can use the **Embedded GUI** to interac with the bot.
 6. Deploy in Hololens. Use **Voice Commands** through the configured Activation keywords to start discussing with your bot.
 7. Voilà
@@ -44,5 +44,5 @@ As the bot personnification is trying to mimic Natural User interactions, *His* 
 A simple proof of Concept where you might find reusable component to build your own Unity Bot Client.
 
 <p align="center">
-  <img src="blob/master/Documentation/Pictures/Bot.png">
+  <img src="Documentation/Pictures/Bot.png">
 </p>

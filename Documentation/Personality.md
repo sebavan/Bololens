@@ -10,7 +10,7 @@ Personality
 The Personality is represented in Untiy by the BotPersonalityManager.cs behaviour.
 
 ## Configuration
-![Configuration](blob/master/Documentation/Pictures/Personality.png)
+![Configuration](Documentation/Pictures/Personality.png)
 
 1. Built In Type: chose amongst the different allowed built in type of supported paersonality.
 2. Custom Caracteristic: you can specify you own behaviour by extending the BaseBotPersonality and referencing the game object hosting your capability here.

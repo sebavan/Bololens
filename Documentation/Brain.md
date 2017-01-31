@@ -19,7 +19,7 @@ The brain is represented in Untiy by the BotBrain.cs behaviour.
 4. **Take Picture Keyword**: the keyword responsible of making the bot take a picture and sending it to the bot framework. This picture does not contain holograms.
 5. **Take Holographic Picture Keyword**: the keyword responsible of making the bot take a picture and sending it to the bot framework. This picture contains holograms.
 6. **Reset Memory Keyword**: the keyword responsible of flushing the bot memory. Any information recorded locally by the bot would be deleted.
-7. **Wait For First Message**: if true, the bot will wait for a first introduction message coming from the server before begin to listen to your voice.
+7. **Wait For First Message**: if true, the bot will wait for a first introduction message coming from the server before it begins to listen to your voice.
 8. **Enable Debug Log**: in order to help troubleshooting the bot the log can be quite verbose. If you would like it being smaller to not interfer with your experience, you can turn it off with this settings.
 
 The other configuration and settings are available through there respective components.

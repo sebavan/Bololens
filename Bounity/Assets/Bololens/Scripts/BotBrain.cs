@@ -225,15 +225,8 @@ namespace Bololens
             personality.Initialize(savedFeelings);
             currentFeeling = personality.GetDominantFeeling();
 
-            // Deals with waiting for the bot introduction.
-            if (WaitForFirstMessage)
-            {
-                materialisation.Materialize(currentFeeling);
-            }
-            else
-            {
-                hearing.ListenForKeywords();
-            }
+            // Listens for the show up command.
+            hearing.ListenForKeywords();
 
             // We are now ending the init mode.
             currentState = BotBrainState.Initialized;
@@ -250,16 +243,8 @@ namespace Bololens
 
             if (materialisation.IsMaterialized)
             {
-                if (WaitForFirstMessage)
-                {
-                    // Begin to read the messages in order to catch the first proactive one.
-                    StartReadingMessages();
-                }
-                else
-                {
-                    // Starts listening for inputs.
-                    hearing.ListenForDictation();
-                }
+                // Recover from slow satrt in term of connectivity.
+                OnAfterMaterialized();
             }
             else
             {
@@ -292,6 +277,30 @@ namespace Bololens
         private void ListenForDictationIfRunning()
         {
             if (currentState == BotBrainState.Running)
+            {
+                OnAfterMaterialized();
+            }
+        }
+
+        /// <summary>
+        /// Deals with the action happening once the bot have been materialized.
+        /// </summary>
+        private void OnAfterMaterialized()
+        {
+            if (currentState != BotBrainState.Running)
+            {
+                return;
+            }
+
+            if (WaitForFirstMessage)
+            {
+                // Begin to read the messages in order to catch the first proactive one.
+                StartReadingMessages();
+
+                // Prevents the bot to wait again for a proactive message on the next time it shows up.
+                WaitForFirstMessage = false;
+            }
+            else
             {
                 hearing.ListenForDictation();
             }

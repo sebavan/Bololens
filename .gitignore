@@ -1,0 +1,20 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+*.suo
+/Bounity/Build
+/Bounity/Library
+/Bounity/Bounity.CSharp.csproj.user
+/Spaghetti/packages
+/Spaghetti/Spaghetti/bin
+/Spaghetti/Spaghetti/obj
+/Spaghetti/Spaghetti/Properties/PublishProfiles
+/Spaghetti/Spaghetti/Web.Release.config
+/Spaghetti/Spaghetti/Spaghetti.csproj.user
+/Bounity/Temp
+/Bounity/obj/Debug
+/Bounity/Assembly-CSharp.csproj
+/Bounity/Bounity.sln
+/Bounity/Bounity.CSharp.csproj
+/Bounity/Bounity.csproj

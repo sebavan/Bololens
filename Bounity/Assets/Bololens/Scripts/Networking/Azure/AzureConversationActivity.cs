@@ -82,5 +82,21 @@ namespace Bololens.Networking.Azure
         /// The reply to id.
         /// </value>
         public string replyToId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name of the conversation activity of type event.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
+        public string name { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value of the conversation activity of type event.
+        /// </summary>
+        /// <value>
+        /// The value.
+        /// </value>
+        public string value { get; set; }
     }
 }

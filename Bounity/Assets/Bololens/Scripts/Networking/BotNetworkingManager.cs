@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Bololens.Core;
 using Bololens.Networking.Azure;
+using UnityEngine.Events;
 
 namespace Bololens.Networking
 {
@@ -14,6 +15,22 @@ namespace Bololens.Networking
     /// <seealso cref="UnityEngine.MonoBehaviour" />
     public class BotNetworkingManager : BaseCaracteristicManager<BaseBotNetworking, BotFramework>
     {
+        /// <summary>
+        /// Holds the Event related information.
+        /// </summary>
+        [System.Serializable]
+        public struct EventTypeAndResponse
+        {
+            [Tooltip("The event type to recognize.")]
+            public string EventType;
+
+            [Tooltip("The UnityEvent to be invoked when the event type is recognized.")]
+            public UnityEvent<string> Callback;
+        }
+
+        [Tooltip("An array of string event type and UnityEvents, to be set in the Inspector.")]
+        public EventTypeAndResponse[] EventTypeAndResponses;
+
         /// <summary>
         /// The custom emotion extractor behaviour if defined by the user.
         /// </summary>
@@ -45,6 +62,7 @@ namespace Bololens.Networking
             }
 
             caracteristic.CustomEmotionExtractor = CustomEmotionExtractor;
+            caracteristic.SetResponsesByEventType(EventTypeAndResponses);
         }
     }
 }

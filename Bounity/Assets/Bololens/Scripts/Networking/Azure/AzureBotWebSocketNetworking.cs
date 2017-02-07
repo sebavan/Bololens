@@ -169,12 +169,12 @@ namespace Bololens.Networking.Azure
         /// <returns>
         /// The IEnumerator allowing coroutines
         /// </returns>
-        protected override IEnumerator ParseMessage(ConversationActivity message, UnityWebRequest request)
+        protected override IEnumerator ParseActivity(ConversationActivity message, UnityWebRequest request)
         {
             // TODO. Deals with more than the latest message.
-            currentWebSocketData.Clear();
+            // currentWebSocketData.Clear();
 
-            return base.ParseMessage(message, request);
+            return base.ParseActivity(message, request);
         }
 
         /// <summary>

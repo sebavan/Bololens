@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Bololens.Core;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Events;
 
 namespace Bololens.Networking
 {
@@ -65,6 +66,12 @@ namespace Bololens.Networking
         }
 
         /// <summary>
+        /// The responses by event type.
+        /// </summary>
+        [NonSerialized]
+        private Dictionary<string, UnityEvent<string>> responsesByEvent = new Dictionary<string, UnityEvent<string>>();
+
+        /// <summary>
         /// Extracts the feeling from the received information.
         /// </summary>
         /// <param name="text">The text.</param>
@@ -106,6 +113,37 @@ namespace Bololens.Networking
         /// <param name="urlOrToken">The URL or the token of the bot service.</param>
         public virtual void Initialize(string urlOrToken)
         {
+        }
+
+        /// <summary>
+        /// Sets the responses by event type.
+        /// </summary>
+        /// <param name="eventTypeAndResponses">The event type and responses.</param>
+        public void SetResponsesByEventType(BotNetworkingManager.EventTypeAndResponse[] eventTypeAndResponses)
+        {
+            if (eventTypeAndResponses == null)
+            {
+                return;
+            }
+
+            foreach (var eventTypeAndResponse in eventTypeAndResponses)
+            {
+                responsesByEvent[eventTypeAndResponse.EventType] = eventTypeAndResponse.Callback;
+            }
+        }
+
+        /// <summary>
+        /// Triggers the event when an event has been received.
+        /// </summary>
+        /// <param name="eventType">The event type of the message.</param>
+        /// <param name="value">The value of the event.</param>
+        protected void TriggerOnEventReceived(string eventType, string value)
+        {
+            BotDebug.Log("BaseBotNetworking: Event received of type " + eventType);
+            if (!string.IsNullOrEmpty(eventType) && responsesByEvent.ContainsKey(eventType))
+            {
+                responsesByEvent[eventType].Invoke(value);
+            }
         }
 
         /// <summary>

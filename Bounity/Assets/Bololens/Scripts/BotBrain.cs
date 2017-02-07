@@ -479,7 +479,8 @@ namespace Bololens
 
             if (e.AudioClip == null)
             {
-                hearing.ListenForDictation();
+                // Simulate TTS delay in editor.
+                Invoke("OnTextToSpeechResultPlayedCallback", 2.0f);
             }
             else
             {

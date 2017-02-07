@@ -288,6 +288,8 @@ namespace Bololens.Networking.Azure
         /// </summary>
         public override void StartReadingMessages()
         {
+            BotDebug.Log("AzureBotNetworking: StartReadingMessages.");
+
             if (IsConversationOver)
             {
                 return;
@@ -307,6 +309,8 @@ namespace Bololens.Networking.Azure
         /// </summary>
         public override void StopReadingMessages()
         {
+            BotDebug.Log("AzureBotNetworking: StopReadingMessages.");
+
             willStopPollingOnNextCall = true;
         }
 
@@ -348,7 +352,7 @@ namespace Bololens.Networking.Azure
                 var message = botMessages.activities[botMessages.activities.Length - 1];
                 if (message.from.id != SENDMESSAGEFROM)
                 {
-                    yield return ParseMessage(message, request);
+                    yield return ParseActivity(message, request);
                 }
             }
 
@@ -370,6 +374,28 @@ namespace Bololens.Networking.Azure
                 }
 
                 yield return PollMessages();
+            }
+        }
+
+        /// <summary>
+        /// Parses the conversation activity.
+        /// </summary>
+        /// <param name="activity">The activity from the bot framework to parse.</param>
+        /// <param name="request">The web request associated.</param>
+        /// <returns>
+        /// The IEnumerator allowing coroutines
+        /// </returns>
+        protected virtual IEnumerator ParseActivity(ConversationActivity activity, UnityWebRequest request)
+        {
+            // TODO.Deals with more activity type.
+            switch (activity.type)
+            {
+                case "event":
+                    return ParseEvent(activity, request);
+                case "message":
+                    return ParseMessage(activity, request);
+                default:
+                    return null;
             }
         }
 
@@ -411,6 +437,21 @@ namespace Bololens.Networking.Azure
 
             // Fallback attachment behaviour.
             return ExtractFeeling(message.text, null, request, OnEmotionExtracted);
+        }
+
+        /// <summary>
+        /// Parses the conversation event.
+        /// </summary>
+        /// <param name="@event">The event from the bot framework to parse.</param>
+        /// <param name="request">The web request associated.</param>
+        /// <returns>
+        /// The IEnumerator allowing coroutines
+        /// </returns>
+        protected virtual IEnumerator ParseEvent(ConversationActivity @event, UnityWebRequest request)
+        {
+            TriggerOnEventReceived(@event.name, @event.value);
+            
+            return null;
         }
 
         /// <summary>

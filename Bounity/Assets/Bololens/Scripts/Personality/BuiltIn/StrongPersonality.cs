@@ -9,7 +9,7 @@ namespace Bololens.Personality.BuiltIn
     /// <summary>
     /// Default Strong personality of the bot.
     /// 
-    /// All feelings are rated the same but the bot will not stay neutral.
+    /// The last feelings in win.
     /// </summary>
     /// <seealso cref="Bololens.Personality.BuiltIn.BaseBuiltInPersonality" />
     public class StrongPersonality : BaseBuiltInPersonality
@@ -24,34 +24,23 @@ namespace Bololens.Personality.BuiltIn
         /// </returns>
         public override Emotions CombineFeeling(Emotions emotion, float quantity)
         {
-            if (feelings.ContainsKey(emotion))
+            Emotions latestEmotion = Emotions.Neutral;
+            foreach (var registeredEmotion in feelings.Keys)
             {
-                quantity += feelings[emotion];
-            }
-
-            feelings[emotion] = quantity;
-
-            // Return the only one we have.
-            if (feelings.Count == 1)
-            {
-                foreach (var registeredEmotion in feelings)
+                if (feelings[registeredEmotion] != 0)
                 {
-                    return registeredEmotion.Key;
+                    latestEmotion = registeredEmotion;
                 }
+
+                feelings[registeredEmotion] = 0;
             }
 
-            var max = 0.0f;
-            foreach (var registeredEmotion in feelings)
+            if (emotion == Emotions.Neutral)
             {
-                // Discard neutral as it as strong feelings.
-                if (registeredEmotion.Key != Emotions.Neutral && registeredEmotion.Value > max)
-                {
-                    dominantFeeling = registeredEmotion.Key;
-                    max = registeredEmotion.Value;
-                }
+                return latestEmotion;
             }
 
-            return dominantFeeling;
+            return emotion;
         }
     }
 }

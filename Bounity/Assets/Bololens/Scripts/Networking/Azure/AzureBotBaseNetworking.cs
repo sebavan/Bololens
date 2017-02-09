@@ -73,11 +73,6 @@ namespace Bololens.Networking.Azure
         protected bool isPollingMessages;
 
         /// <summary>
-        /// Specifies wether or not the client will stop polling messages on the next call.
-        /// </summary>
-        protected bool willStopPollingOnNextCall;
-
-        /// <summary>
         /// Specifies wether or not the communication is currently sending a message (Text/Picture/...) to the bot.
         /// </summary>
         protected bool isSendingMessage = false;
@@ -341,8 +336,6 @@ namespace Bololens.Networking.Azure
                 isPollingMessages = true;
                 StartCoroutine(PollMessages());
             }
-
-            willStopPollingOnNextCall = false;
         }
 
         /// <summary>
@@ -352,7 +345,7 @@ namespace Bololens.Networking.Azure
         {
             BotDebug.Log("AzureBotNetworking: StopReadingMessages.");
 
-            willStopPollingOnNextCall = true;
+            isPollingMessages = false;
         }
 
         /// <summary>
@@ -389,33 +382,29 @@ namespace Bololens.Networking.Azure
             // Notify that new activities have been received.
             if (botMessages.activities != null && botMessages.activities.Length > 0)
             {
-                // TODO. Deals with more than just the latest new activities.
-                var message = botMessages.activities[botMessages.activities.Length - 1];
-                if (message.from.id != userId)
+                for (var i = 0; i < botMessages.activities.Length; i++)
                 {
-                    yield return ParseActivity(message, request);
+                    var message = botMessages.activities[i];
+                    if (message.from.id != userId)
+                    {
+                        yield return ParseActivity(message, request);
+                    }
                 }
             }
 
-            // Defer one frame.
-            yield return null;
-
             // Stops or restart polling messages
-            if (willStopPollingOnNextCall)
+            if (pollingRate > 0.0f)
             {
-                willStopPollingOnNextCall = false;
-                isPollingMessages = false;
+                // Only applies polling rate if requested.
+                yield return new WaitForSeconds(pollingRate);
             }
             else
             {
-                if (pollingRate > 0.0f)
-                {
-                    // Only applies polling rate if requested.
-                    yield return new WaitForSeconds(pollingRate);
-                }
-
-                yield return PollMessages();
+                // Defer one frame.
+                yield return null;
             }
+
+            yield return PollMessages();
         }
 
         /// <summary>

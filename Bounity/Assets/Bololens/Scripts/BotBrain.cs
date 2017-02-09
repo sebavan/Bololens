@@ -101,6 +101,16 @@ namespace Bololens
         private BotBrainState currentState;
 
         /// <summary>
+        /// The latest received messages.
+        /// </summary>
+        private Stack<BotMessageEventArgs> messagesToTreat = new Stack<BotMessageEventArgs>();
+
+        /// <summary>
+        /// Indicates to wait for the next message from the bot.
+        /// </summary>
+        public bool waitForNextMessage = false;
+
+        /// <summary>
         /// The bot service url or token to use.
         /// </summary>
         [Tooltip("The url of a token genration service or the bot service token.")]
@@ -173,6 +183,10 @@ namespace Bololens
                     if (networking.IsConversationOver)
                     {
                         StopTheBot();
+                    }
+                    else if (waitForNextMessage)
+                    {
+                        TreatMessages();
                     }
                     break;
                 case BotBrainState.Stopped:
@@ -255,6 +269,7 @@ namespace Bololens
             // The bot is now running.
             currentState = BotBrainState.Running;
             materialisation.HideFeedback();
+            networking.StartReadingMessages();
 
             if (materialisation.IsMaterialized)
             {
@@ -281,20 +296,14 @@ namespace Bololens
             materialisation.Dematerialize(currentFeeling);
         }
 
+        /// <summary>
+        /// Handles the OnKeywordDetected event of the Hearing control.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         private void Hearing_OnKeywordDetected(object sender, System.EventArgs e)
         {
-            materialisation.Materialize(currentFeeling, ListenForDictationIfRunning);
-        }
-
-        /// <summary>
-        /// Listens for dictation if the bot is in running state only.
-        /// </summary>
-        private void ListenForDictationIfRunning()
-        {
-            if (currentState == BotBrainState.Running)
-            {
-                OnAfterMaterialized();
-            }
+            materialisation.Materialize(currentFeeling, OnAfterMaterialized);
         }
 
         /// <summary>
@@ -310,14 +319,14 @@ namespace Bololens
             if (WaitForFirstMessage)
             {
                 // Begin to read the messages in order to catch the first proactive one.
-                StartReadingMessages();
+                WaitForNextMessage();
 
                 // Prevents the bot to wait again for a proactive message on the next time it shows up.
                 WaitForFirstMessage = false;
             }
             else
             {
-                hearing.ListenForDictation();
+                EmptyMessageQueueAndListen();
             }
         }
 
@@ -333,12 +342,12 @@ namespace Bololens
             if (string.Compare(e.Text, DesactivationKeyword, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 materialisation.Dematerialize(currentFeeling);
-                networking.StopReadingMessages();
                 hearing.ListenForKeywords();
             }
             else if (string.Compare(e.Text, ResetMemoryKeyword, StringComparison.OrdinalIgnoreCase) == 0)
             {
                 memory.Delete(BOTFEELINGSMEMORYKEY);
+                memory.Delete(BOTUSERIDMEMORYKEY);
                 personality.ResetFeelings();
                 hearing.ListenForDictation();
             }
@@ -358,7 +367,7 @@ namespace Bololens
             {
                 hearing.StopListening();
                 networking.SendTextMessage(e.Text);
-                StartReadingMessages();
+                WaitForNextMessage();
             }
         }
 
@@ -371,7 +380,6 @@ namespace Bololens
         private void Hearing_OnDictationTimeout(object sender, EventArgs e)
         {
             materialisation.Dematerialize(currentFeeling);
-            networking.StopReadingMessages();
             hearing.StopListening();
             StartCoroutine(StartListeningForKeywordDelayed());
         }
@@ -399,16 +407,16 @@ namespace Bololens
             BotDebug.Log("BotBrain: Captured picture - " + (e.Holograms ? "Holo" : "No Holo"));
 
             networking.SendPicture(e.Holograms ? "picture" : "holoPicture", e.Buffer);
-            StartReadingMessages();
+            WaitForNextMessage();
         }
 
         /// <summary>
         /// Starts reading the messages from the server.
         /// </summary>
-        private void StartReadingMessages()
+        private void WaitForNextMessage()
         {
             materialisation.ShowFeedback("Thinking\r\n...");
-            networking.StartReadingMessages();
+            waitForNextMessage = true;
         }
 
         /// <summary>
@@ -418,7 +426,7 @@ namespace Bololens
         /// <param name="e">The <see cref="EventArgs"/> instance containing the event data.</param>
         private void Sight_OnCapturedPictureError(object sender, EventArgs e)
         {
-            hearing.ListenForDictation();
+            EmptyMessageQueueAndListen();
         }
 
         /// <summary>
@@ -429,17 +437,32 @@ namespace Bololens
         private void Networking_OnMessageReceived(object sender, BotMessageEventArgs e)
         {
             BotDebug.Log("BotBrain: Received a message - " + e.Text);
+            messagesToTreat.Push(e);
+        }
+
+        /// <summary>
+        /// Treats the messages from the queue.
+        /// </summary>
+        private void TreatMessages()
+        {
+            if (messagesToTreat.Count == 0)
+            {
+                return;
+            }
+
+            // Stop parsing the queue.
+            waitForNextMessage = false;
+
+            // Pop the latest message.
+            var message = messagesToTreat.Pop();
             materialisation.HideFeedback();
 
-            // Stops current actions.
-            networking.StopReadingMessages();
-
             // Compute new feeling.
-            CombineFeeling(e.Feeling, e.FeelingQuantity);
+            CombineFeeling(message.Feeling, message.FeelingQuantity);
 
             // Show results.
-            ShowPicture(e.Texture);
-            ShowText(e.Text);
+            ShowPicture(message.Texture);
+            ShowText(message.Text);
             
             // TODO. Deals with more result types like prompt and cards.
         }
@@ -477,7 +500,7 @@ namespace Bololens
             }
             else
             {
-                hearing.ListenForDictation();
+                EmptyMessageQueueAndListen();
             }
 
             materialisation.ShowText(text, currentFeeling);
@@ -495,20 +518,27 @@ namespace Bololens
             if (e.AudioClip == null)
             {
                 // Simulate TTS delay in editor.
-                Invoke("OnTextToSpeechResultPlayedCallback", 2.0f);
+                Invoke("EmptyMessageQueueAndListen", 2.0f);
             }
             else
             {
-                materialisation.PlaySound(e.AudioClip, OnTextToSpeechResultPlayedCallback);
+                materialisation.PlaySound(e.AudioClip, EmptyMessageQueueAndListen);
             }
         }
 
         /// <summary>
-        /// Handles the OnAudioEndCallback event of the Materialisation caracteristic.
+        /// Empties the message queue and starts listening for dication.
         /// </summary>
-        private void OnTextToSpeechResultPlayedCallback()
+        private void EmptyMessageQueueAndListen()
         {
-            hearing.ListenForDictation();
+            if (messagesToTreat.Count > 0)
+            {
+                waitForNextMessage = true;
+            }
+            else
+            {
+                hearing.ListenForDictation();
+            }
         }
 
         /// <summary>
@@ -518,6 +548,7 @@ namespace Bololens
         {
             if (networking != null)
             {
+                networking.StopReadingMessages();
                 networking.OnMessageReceived -= Networking_OnMessageReceived;
             }
 

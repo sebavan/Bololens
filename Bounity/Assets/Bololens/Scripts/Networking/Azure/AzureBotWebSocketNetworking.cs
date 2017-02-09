@@ -149,16 +149,23 @@ namespace Bololens.Networking.Azure
         /// </returns>
         protected override IEnumerator PollMessages()
         {
-            if (currentWebSocketData.Count == 0)
+            if (isPollingMessages)
             {
-                // Retry next frame.
-                yield return null;
-                yield return PollMessages();
+                if (currentWebSocketData.Count == 0)
+                {
+                    // Retry next frame.
+                    yield return null;
+                    yield return PollMessages();
+                }
+                else
+                {
+                    var message = currentWebSocketData.Pop();
+                    yield return OnPollMessagesResult(message, null);
+                }
             }
             else
             {
-                var message = currentWebSocketData.Pop();
-                yield return OnPollMessagesResult(message, null);
+                yield return null;
             }
         }
 
@@ -172,9 +179,6 @@ namespace Bololens.Networking.Azure
         /// </returns>
         protected override IEnumerator ParseActivity(ConversationActivity message, UnityWebRequest request)
         {
-            // TODO. Deals with more than the latest message.
-            // currentWebSocketData.Clear();
-
             return base.ParseActivity(message, request);
         }
 

@@ -19,7 +19,7 @@ namespace Bololens.Networking.Azure
         /// <summary>
         /// The polling rate in seconds.
         /// </summary>
-        public const float POLLINGRATE = 0.3f;
+        public const float POLLINGRATE = 0.5f;
 
         /// <summary>
         /// Initializees the bot client using the specified URL.
@@ -45,15 +45,22 @@ namespace Bololens.Networking.Azure
                 yield return null;
             }
 
-            var url = CONNECTORSERVICECONVERSATIONURL + "/" + conversationId + "/activities";
-            if (!string.IsNullOrEmpty(watermark))
+            if (isPollingMessages)
             {
-                url += "/?watermark=" + watermark;
+                var url = CONNECTORSERVICECONVERSATIONURL + "/" + conversationId + "/activities";
+                if (!string.IsNullOrEmpty(watermark))
+                {
+                    url += "/?watermark=" + watermark;
+                }
+
+                var request = UnityWebRequest.Get(url);
+
+                yield return ExecuteRequest(request, OnPollMessagesResult, true);
             }
-
-            var request = UnityWebRequest.Get(url);
-
-            yield return ExecuteRequest(request, OnPollMessagesResult, true);
+            else
+            {
+                yield return null;
+            }
         }
     }
 }

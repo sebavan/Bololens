@@ -108,7 +108,7 @@ namespace Bololens
         /// <summary>
         /// Indicates to wait for the next message from the bot.
         /// </summary>
-        public bool waitForNextMessage = false;
+        private bool waitForNextMessage = false;
 
         /// <summary>
         /// The bot service url or token to use.

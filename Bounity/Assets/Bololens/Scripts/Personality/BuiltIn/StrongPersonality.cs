@@ -35,12 +35,14 @@ namespace Bololens.Personality.BuiltIn
                 feelings[registeredEmotion] = 0;
             }
 
-            if (emotion == Emotions.Neutral)
+            if (emotion != Emotions.Neutral)
             {
-                return latestEmotion;
+                latestEmotion = emotion;
             }
 
-            return emotion;
+            feelings[latestEmotion] = quantity;
+
+            return latestEmotion;
         }
     }
 }

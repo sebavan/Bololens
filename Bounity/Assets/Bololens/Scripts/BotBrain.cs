@@ -46,6 +46,11 @@ namespace Bololens
         private const string BOTFEELINGSMEMORYKEY = "Feelings";
 
         /// <summary>
+        /// The bot user id memory key.
+        /// </summary>
+        private const string BOTUSERIDMEMORYKEY = "UserId";
+
+        /// <summary>
         /// The actions delay in seconds;
         /// </summary>
         private const float ACTIONSDELAY = 0.7f;
@@ -203,8 +208,18 @@ namespace Bololens
             // Initializes all of them.
             materialisation.Initialize();
 
+            // Memory initialization.
+            memory.Initialize();
+            var userId = memory.Load<Guid>(BOTUSERIDMEMORYKEY);
+            if (userId == Guid.Empty)
+            {
+                userId = Guid.NewGuid();
+                memory.Save(BOTUSERIDMEMORYKEY, userId);
+            }
+            
+            // Networking.
             materialisation.ShowFeedback("Connecting\r\n...");
-            networking.Initialize(UrlOrToken);
+            networking.Initialize(UrlOrToken, userId.ToString());
             networking.OnMessageReceived += Networking_OnMessageReceived;
 
             hearing.Initialize(ActivationKeywords);
@@ -219,8 +234,6 @@ namespace Bololens
             sight.OnCapturedPicture += Sight_OnCapturedPicture;
             sight.OnCapturedPictureError += Sight_OnCapturedPictureError;
 
-            memory.Initialize();
-
             var savedFeelings = memory.Load<Dictionary<Emotions, float>>(BOTFEELINGSMEMORYKEY);
             personality.Initialize(savedFeelings);
             currentFeeling = personality.GetDominantFeeling();
@@ -231,6 +244,8 @@ namespace Bololens
             // We are now ending the init mode.
             currentState = BotBrainState.Initialized;
         }
+
+        
 
         /// <summary>
         /// Starts running the bot after full intialization.

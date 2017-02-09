@@ -30,9 +30,10 @@ namespace Bololens.Networking.Azure
         /// Initializees the bot client using the specified URL.
         /// </summary>
         /// <param name="urlOrToken">The URL or the token of the bot service.</param>
-        public override void Initialize(string urlOrToken)
+        /// <param name="userId">The user identifier.</param>
+        public override void Initialize(string urlOrToken, string userId)
         {
-            base.Initialize(urlOrToken);
+            base.Initialize(urlOrToken, userId);
             // Disable polling.
             pollingRate = -1.0f;
         }

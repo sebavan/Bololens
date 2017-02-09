@@ -18,11 +18,6 @@ namespace Bololens.Networking.Azure
     public abstract class AzureBotBaseNetworking : BaseBotNetworking
     {
         /// <summary>
-        /// The sender name of the message.
-        /// </summary>
-        private const string SENDMESSAGEFROM = "Unity";
-
-        /// <summary>
         /// The connector serivce baseurl.
         /// </summary>
         protected const string CONNECTORSERIVCEBASEURL = "https://directline.botframework.com";
@@ -51,6 +46,11 @@ namespace Bololens.Networking.Azure
         /// The current text message to use after loading attachment.
         /// </summary>
         private string currentTextMessage;
+
+        /// <summary>
+        /// The current user identifier.
+        /// </summary>
+        protected string userId;
 
         /// <summary>
         /// The watermark used to not read twice some parts of the conversation.
@@ -91,13 +91,22 @@ namespace Bololens.Networking.Azure
         /// Initializees the bot client using the specified URL.
         /// </summary>
         /// <param name="urlOrToken">The URL or the token of the bot service.</param>
-        public override void Initialize(string urlOrToken)
+        /// <param name="userId">The user identifier.</param>
+        public override void Initialize(string urlOrToken, string userId)
         {
             if (string.IsNullOrEmpty(urlOrToken))
             {
                 BotDebug.LogError("AzureBotNetworking: Please specify your token service url or your bot token.");
                 return;
             }
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                BotDebug.LogError("AzureBotNetworking: A user identifier should have been created.");
+                return;
+            }
+
+            this.userId = userId;
 
             if (urlOrToken.ToLower().StartsWith("http"))
             {
@@ -236,7 +245,7 @@ namespace Bololens.Networking.Azure
                 ""from"": {{
                         ""id"": ""{1}""
                 }}
-            }}", text, SENDMESSAGEFROM);
+            }}", text, userId);
 
             var request = UnityWebRequest.Post(CONNECTORSERVICECONVERSATIONURL + "/" + conversationId + "/activities", "DUMMY");
 
@@ -260,7 +269,7 @@ namespace Bololens.Networking.Azure
 
             isSendingMessage = true;
 
-            var request = UnityWebRequest.Post(CONNECTORSERVICECONVERSATIONURL + "/" + conversationId + "/upload?userId=" + SENDMESSAGEFROM, "DUMMY");
+            var request = UnityWebRequest.Post(CONNECTORSERVICECONVERSATIONURL + "/" + conversationId + "/upload?userId=" + userId, "DUMMY");
 
             UploadHandler uploader = new UploadHandlerRaw(buffer);
             request.uploadHandler = uploader;
@@ -350,7 +359,7 @@ namespace Bololens.Networking.Azure
             {
                 // TODO. Deals with more than just the latest new activities.
                 var message = botMessages.activities[botMessages.activities.Length - 1];
-                if (message.from.id != SENDMESSAGEFROM)
+                if (message.from.id != userId)
                 {
                     yield return ParseActivity(message, request);
                 }

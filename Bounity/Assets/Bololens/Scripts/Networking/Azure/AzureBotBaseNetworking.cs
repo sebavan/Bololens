@@ -256,6 +256,38 @@ namespace Bololens.Networking.Azure
         }
 
         /// <summary>
+        /// Sends an event to the network.
+        /// </summary>
+        /// <param name="eventType">Type of the event.</param>
+        /// <param name="eventValue">The event value.</param>
+        public override void SendEvent(string eventType, string eventValue)
+        {
+            if (IsConversationOver)
+            {
+                return;
+            }
+
+            isSendingMessage = true;
+
+            string jsonData = string.Format(@"{{
+                ""type"": ""event"",
+                ""name"": ""{0}"",
+                ""value"": ""{1}"",
+                ""text"": """",
+                ""from"": {{
+                        ""id"": ""{2}""
+                }}
+            }}", eventType, eventValue, userId);
+
+            var request = UnityWebRequest.Post(CONNECTORSERVICECONVERSATIONURL + "/" + conversationId + "/activities", "DUMMY");
+
+            UploadHandler uploader = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonData));
+            request.uploadHandler = uploader;
+
+            StartCoroutine(ExecuteRequest(request, OnMessageSent, true));
+        }
+
+        /// <summary>
         /// Sends a picture to the bot.
         /// </summary>
         /// <param name="fileName">Name of the file.</param>

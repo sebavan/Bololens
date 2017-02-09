@@ -161,6 +161,13 @@ namespace Bololens.Networking
         public abstract void SendPicture(string fileName, byte[] buffer);
 
         /// <summary>
+        /// Sends an event to the network.
+        /// </summary>
+        /// <param name="eventType">Type of the event.</param>
+        /// <param name="eventValue">The event value.</param>
+        public abstract void SendEvent(string eventType, string eventValue);
+
+        /// <summary>
         /// Starts polling the messages from the network.
         /// </summary>
         public abstract void StartReadingMessages();

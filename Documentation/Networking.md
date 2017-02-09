@@ -16,6 +16,7 @@ The Networking is represented in Untiy by the BotNetworkingManager.cs behaviour.
 2. **Custom Caracteristic**: you can specify you own behaviour by extending the BaseBotNetworking and referencing the game object hosting your capability here.
 3. **Custom Emotion Extractor**: by default emotion are extracted from messages from te emoticons available in the messages. Changing this behaviour to use coginitive servicces for instance could be done by creating a behaviour inheriting from BaseBotNetworkingEmotionExtractor and referencing it here. Only one method called ExtractFeeling has to be implemented. You could genuinly wonder why to do this here ? The fact is the emotion information could be contained in none visible part of the network mesage received from the bot framework.
 4. **Use Web Socket**: Specifies or not the use of Web Socket is allowed for the remote communication.
+5. **Event Type and Responses**: Associate event types to your custom in game behaviour. This can help your bot server to change the state of your game. This is the same as the back channel feature supported by the web chat.
 
 ## Details
 Thanks to websocket-sharp for the WebSocket cross platform implementation.   

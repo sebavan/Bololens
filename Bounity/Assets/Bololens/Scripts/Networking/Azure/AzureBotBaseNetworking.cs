@@ -349,7 +349,7 @@ namespace Bololens.Networking.Azure
         }
 
         /// <summary>
-        /// Polls the messages from either the websocket message stack or the server by get.
+        /// Polls the messages from either the websocket message queue or the server by get.
         /// </summary>
         /// <returns>
         /// The enumerator allowing coroutines.

@@ -103,7 +103,7 @@ namespace Bololens
         /// <summary>
         /// The latest received messages.
         /// </summary>
-        private Stack<BotMessageEventArgs> messagesToTreat = new Stack<BotMessageEventArgs>();
+        private Queue<BotMessageEventArgs> messagesToTreat = new Queue<BotMessageEventArgs>();
 
         /// <summary>
         /// Indicates to wait for the next message from the bot.
@@ -437,7 +437,7 @@ namespace Bololens
         private void Networking_OnMessageReceived(object sender, BotMessageEventArgs e)
         {
             BotDebug.Log("BotBrain: Received a message - " + e.Text);
-            messagesToTreat.Push(e);
+            messagesToTreat.Enqueue(e);
         }
 
         /// <summary>
@@ -454,7 +454,7 @@ namespace Bololens
             waitForNextMessage = false;
 
             // Pop the latest message.
-            var message = messagesToTreat.Pop();
+            var message = messagesToTreat.Dequeue();
             materialisation.HideFeedback();
 
             // Compute new feeling.

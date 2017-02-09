@@ -24,7 +24,7 @@ namespace Bololens.Networking.Azure
         /// <summary>
         /// The latest received unprocessed web socket data.
         /// </summary>
-        private Stack<string> currentWebSocketData = new Stack<string>();
+        private Queue<string> currentWebSocketData = new Queue<string>();
 
         /// <summary>
         /// Initializees the bot client using the specified URL.
@@ -136,13 +136,13 @@ namespace Bololens.Networking.Azure
                 }
                 else
                 {
-                    currentWebSocketData.Push(e.Data);
+                    currentWebSocketData.Enqueue(e.Data);
                 }
             }
         }
 
         /// <summary>
-        /// Polls the messages from the websocket message stack.
+        /// Polls the messages from the websocket message queue.
         /// </summary>
         /// <returns>
         /// The enumerator allowing coroutines.
@@ -159,7 +159,7 @@ namespace Bololens.Networking.Azure
                 }
                 else
                 {
-                    var message = currentWebSocketData.Pop();
+                    var message = currentWebSocketData.Dequeue();
                     yield return OnPollMessagesResult(message, null);
                 }
             }

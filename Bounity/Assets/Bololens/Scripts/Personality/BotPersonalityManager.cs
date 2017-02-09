@@ -23,6 +23,9 @@ namespace Bololens.Personality
         {
             switch (BuiltInType)
             {
+                case PersonalityType.Strong:
+                    caracteristic = gameObject.AddComponent<StrongPersonality>();
+                    break;
                 case PersonalityType.Crazy:
                     caracteristic = gameObject.AddComponent<CrazyPersonality>();
                     break;

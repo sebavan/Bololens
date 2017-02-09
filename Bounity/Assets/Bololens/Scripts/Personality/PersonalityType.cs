@@ -10,6 +10,7 @@ namespace Bololens.Personality
     public enum PersonalityType
     {
         Neutral,
+        Strong,
         Crazy,
         Psychopath,
     }

@@ -15,6 +15,11 @@ namespace Bololens.Personality.BuiltIn
     public class StrongPersonality : BaseBuiltInPersonality
     {
         /// <summary>
+        /// The available emotions used to prevent reallocation.
+        /// </summary>
+        private List<Emotions> availableEmotions = new List<Emotions>();
+
+        /// <summary>
         /// Combines the feeling.
         /// </summary>
         /// <param name="emotion">The emotion to add in the mix.</param>
@@ -24,25 +29,35 @@ namespace Bololens.Personality.BuiltIn
         /// </returns>
         public override Emotions CombineFeeling(Emotions emotion, float quantity)
         {
-            Emotions latestEmotion = Emotions.Neutral;
+            if (quantity == 0)
+            {
+                emotion = Emotions.Neutral;
+            }
+
+            availableEmotions.Clear();
             foreach (var registeredEmotion in feelings.Keys)
             {
                 if (feelings[registeredEmotion] != 0)
                 {
-                    latestEmotion = registeredEmotion;
+                    dominantFeeling = registeredEmotion;
                 }
 
-                feelings[registeredEmotion] = 0;
+                availableEmotions.Add(registeredEmotion);
+            }
+
+            for (int i = 0; i < availableEmotions.Count; i++)
+            {
+                feelings[availableEmotions[i]] = 0;
             }
 
             if (emotion != Emotions.Neutral)
             {
-                latestEmotion = emotion;
+                dominantFeeling = emotion;
             }
 
-            feelings[latestEmotion] = quantity;
+            feelings[dominantFeeling] = quantity;
 
-            return latestEmotion;
+            return dominantFeeling;
         }
     }
 }

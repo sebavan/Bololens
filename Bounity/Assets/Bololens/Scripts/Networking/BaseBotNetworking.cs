@@ -14,6 +14,11 @@ namespace Bololens.Networking
     public abstract class BaseBotNetworking : MonoBehaviour
     {
         /// <summary>
+        /// The latest event value that was received before triggering (all monothreaded so it should be ok).
+        /// </summary>
+        private string latestEventValue;
+
+        /// <summary>
         /// Occurs when a message has been received by the networking component.
         /// </summary>
         public event EventHandler<BotMessageEventArgs> OnMessageReceived;
@@ -69,7 +74,7 @@ namespace Bololens.Networking
         /// The responses by event type.
         /// </summary>
         [NonSerialized]
-        private Dictionary<string, UnityEvent<string>> responsesByEvent = new Dictionary<string, UnityEvent<string>>();
+        private Dictionary<string, UnityEvent> responsesByEvent = new Dictionary<string, UnityEvent>();
 
         /// <summary>
         /// Extracts the feeling from the received information.
@@ -143,8 +148,20 @@ namespace Bololens.Networking
             BotDebug.Log("BaseBotNetworking: Event received of type " + eventType);
             if (!string.IsNullOrEmpty(eventType) && responsesByEvent.ContainsKey(eventType))
             {
-                responsesByEvent[eventType].Invoke(value);
+                latestEventValue = value;
+                responsesByEvent[eventType].Invoke();
             }
+        }
+
+        /// <summary>
+        /// Gets the latest event value.
+        /// </summary>
+        /// <returns>
+        /// The latest event value.
+        /// </returns>
+        public string GetLatestEventValue()
+        {
+            return latestEventValue;
         }
 
         /// <summary>

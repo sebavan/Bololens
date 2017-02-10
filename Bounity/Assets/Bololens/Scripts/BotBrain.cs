@@ -58,37 +58,37 @@ namespace Bololens
         /// <summary>
         /// The bot materialisation.
         /// </summary>
-        private BaseBotMaterialisation materialisation;
+        public BaseBotMaterialisation Materialisation { get; private set; }
 
         /// <summary>
         /// The bot communication device (e.g. networking of the bot framework).
         /// </summary>
-        private BaseBotNetworking networking;
+        public BaseBotNetworking Networking { get; private set; }
 
         /// <summary>
         /// The bot speech.
         /// </summary>
-        private BaseBotSpeech speech;
+        public BaseBotSpeech Speech { get; private set; }
 
         /// <summary>
         /// The bot hearing sense.
         /// </summary>
-        private BaseBotHearing hearing;
+        public BaseBotHearing Hearing { get; private set; }
 
         /// <summary>
         /// The bot sight.
         /// </summary>
-        private BaseBotSight sight;
+        public BaseBotSight Sight { get; private set; }
 
         /// <summary>
         /// The bot personality
         /// </summary>
-        private BaseBotPersonality personality;
+        public BaseBotPersonality Personality { get; private set; }
 
         /// <summary>
         /// The bot memory
         /// </summary>
-        private BaseBotMemory memory;
+        public BaseBotMemory Memory { get; private set; }
 
         /// <summary>
         /// The current feeling of the bot.
@@ -174,13 +174,13 @@ namespace Bololens
                 case BotBrainState.Initializing:
                     break;
                 case BotBrainState.Initialized:
-                    if (networking.IsInitialized)
+                    if (Networking.IsInitialized)
                     {
                         RunTheBot();
                     }
                     break;
                 case BotBrainState.Running:
-                    if (networking.IsConversationOver)
+                    if (Networking.IsConversationOver)
                     {
                         StopTheBot();
                     }
@@ -211,55 +211,53 @@ namespace Bololens
             yield return new WaitForSeconds(0.1f);
 
             // Find all the created components.
-            materialisation = GetComponent<BotMaterialisationManager>();
-            networking = GetComponent<BotNetworkingManager>().Instance;
-            speech = GetComponent<BotSpeechManager>().Instance;
-            hearing = GetComponent<BotHearingManager>().Instance;
-            sight = GetComponent<BotSightManager>().Instance;
-            personality = GetComponent<BotPersonalityManager>().Instance;
-            memory = GetComponent<BotMemoryManager>().Instance;
+            Materialisation = GetComponent<BotMaterialisationManager>();
+            Networking = GetComponent<BotNetworkingManager>().Instance;
+            Speech = GetComponent<BotSpeechManager>().Instance;
+            Hearing = GetComponent<BotHearingManager>().Instance;
+            Sight = GetComponent<BotSightManager>().Instance;
+            Personality = GetComponent<BotPersonalityManager>().Instance;
+            Memory = GetComponent<BotMemoryManager>().Instance;
 
             // Initializes all of them.
-            materialisation.Initialize();
+            Materialisation.Initialize();
 
             // Memory initialization.
-            memory.Initialize();
-            var userId = memory.Load<Guid>(BOTUSERIDMEMORYKEY);
+            Memory.Initialize();
+            var userId = Memory.Load<Guid>(BOTUSERIDMEMORYKEY);
             if (userId == Guid.Empty)
             {
                 userId = Guid.NewGuid();
-                memory.Save(BOTUSERIDMEMORYKEY, userId);
+                Memory.Save(BOTUSERIDMEMORYKEY, userId);
             }
-            
+
             // Networking.
-            materialisation.ShowFeedback("Connecting\r\n...");
-            networking.Initialize(UrlOrToken, userId.ToString());
-            networking.OnMessageReceived += Networking_OnMessageReceived;
+            Materialisation.ShowFeedback("Connecting\r\n...");
+            Networking.Initialize(UrlOrToken, userId.ToString());
+            Networking.OnMessageReceived += Networking_OnMessageReceived;
 
-            hearing.Initialize(ActivationKeywords);
-            hearing.OnDictationTimeout += Hearing_OnDictationTimeout;
-            hearing.OnDictationResult += Hearing_OnDictationResult;
-            hearing.OnKeywordDetected += Hearing_OnKeywordDetected;
+            Hearing.Initialize(ActivationKeywords);
+            Hearing.OnDictationTimeout += Hearing_OnDictationTimeout;
+            Hearing.OnDictationResult += Hearing_OnDictationResult;
+            Hearing.OnKeywordDetected += Hearing_OnKeywordDetected;
 
-            speech.Initialize();
-            speech.OnTextToSpeechResult += Speech_OnTextToSpeechResult;
+            Speech.Initialize();
+            Speech.OnTextToSpeechResult += Speech_OnTextToSpeechResult;
 
-            sight.Initialize();
-            sight.OnCapturedPicture += Sight_OnCapturedPicture;
-            sight.OnCapturedPictureError += Sight_OnCapturedPictureError;
+            Sight.Initialize();
+            Sight.OnCapturedPicture += Sight_OnCapturedPicture;
+            Sight.OnCapturedPictureError += Sight_OnCapturedPictureError;
 
-            var savedFeelings = memory.Load<Dictionary<Emotions, float>>(BOTFEELINGSMEMORYKEY);
-            personality.Initialize(savedFeelings);
-            currentFeeling = personality.GetDominantFeeling();
+            var savedFeelings = Memory.Load<Dictionary<Emotions, float>>(BOTFEELINGSMEMORYKEY);
+            Personality.Initialize(savedFeelings);
+            currentFeeling = Personality.GetDominantFeeling();
 
             // Listens for the show up command.
-            hearing.ListenForKeywords();
+            Hearing.ListenForKeywords();
 
             // We are now ending the init mode.
             currentState = BotBrainState.Initialized;
         }
-
-        
 
         /// <summary>
         /// Starts running the bot after full intialization.
@@ -268,10 +266,10 @@ namespace Bololens
         {
             // The bot is now running.
             currentState = BotBrainState.Running;
-            materialisation.HideFeedback();
-            networking.StartReadingMessages();
+            Materialisation.HideFeedback();
+            Networking.StartReadingMessages();
 
-            if (materialisation.IsMaterialized)
+            if (Materialisation.IsMaterialized)
             {
                 // Recover from slow satrt in term of connectivity.
                 OnAfterMaterialized();
@@ -291,9 +289,9 @@ namespace Bololens
             // The bot is now stopped.
             currentState = BotBrainState.Stopped;
 
-            hearing.StopListening();
-            networking.StopReadingMessages();
-            materialisation.Dematerialize(currentFeeling);
+            Hearing.StopListening();
+            Networking.StopReadingMessages();
+            Materialisation.Dematerialize(currentFeeling);
         }
 
         /// <summary>
@@ -303,7 +301,7 @@ namespace Bololens
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
         private void Hearing_OnKeywordDetected(object sender, System.EventArgs e)
         {
-            materialisation.Materialize(currentFeeling, OnAfterMaterialized);
+            Materialisation.Materialize(currentFeeling, OnAfterMaterialized);
         }
 
         /// <summary>
@@ -341,32 +339,32 @@ namespace Bololens
 
             if (string.Compare(e.Text, DesactivationKeyword, StringComparison.OrdinalIgnoreCase) == 0)
             {
-                materialisation.Dematerialize(currentFeeling);
-                hearing.ListenForKeywords();
+                Materialisation.Dematerialize(currentFeeling);
+                Hearing.ListenForKeywords();
             }
             else if (string.Compare(e.Text, ResetMemoryKeyword, StringComparison.OrdinalIgnoreCase) == 0)
             {
-                memory.Delete(BOTFEELINGSMEMORYKEY);
-                memory.Delete(BOTUSERIDMEMORYKEY);
-                personality.ResetFeelings();
-                hearing.ListenForDictation();
+                Memory.Delete(BOTFEELINGSMEMORYKEY);
+                Memory.Delete(BOTUSERIDMEMORYKEY);
+                Personality.ResetFeelings();
+                Hearing.ListenForDictation();
             }
             else if (string.Compare(e.Text, TakePictureKeyword, StringComparison.OrdinalIgnoreCase) == 0)
             {
-                hearing.StopListening();
-                sight.CapturePicture(false);
+                Hearing.StopListening();
+                Sight.CapturePicture(false);
                 // Do not start listening now as it is async. This is done once the screenshot is captured.
             }
             else if (string.Compare(e.Text, TakeHolographicPictureKeyword, StringComparison.OrdinalIgnoreCase) == 0)
             {
-                hearing.StopListening();
-                sight.CapturePicture(true);
+                Hearing.StopListening();
+                Sight.CapturePicture(true);
                 // Do not start listening now as it is async. This is done once the screenshot is captured.
             }
             else
             {
-                hearing.StopListening();
-                networking.SendTextMessage(e.Text);
+                Hearing.StopListening();
+                Networking.SendTextMessage(e.Text);
                 WaitForNextMessage();
             }
         }
@@ -379,8 +377,8 @@ namespace Bololens
         /// <exception cref="System.NotImplementedException"></exception>
         private void Hearing_OnDictationTimeout(object sender, EventArgs e)
         {
-            materialisation.Dematerialize(currentFeeling);
-            hearing.StopListening();
+            Materialisation.Dematerialize(currentFeeling);
+            Hearing.StopListening();
             StartCoroutine(StartListeningForKeywordDelayed());
         }
 
@@ -390,11 +388,11 @@ namespace Bololens
         /// <returns>
         /// The coroutine enumerator
         /// </returns>
-        IEnumerator StartListeningForKeywordDelayed()
+        private IEnumerator StartListeningForKeywordDelayed()
         {
             // Delay first read to allow server processing time.
             yield return new WaitForSeconds(ACTIONSDELAY);
-            hearing.ListenForKeywords();
+            Hearing.ListenForKeywords();
         }
 
         /// <summary>
@@ -406,7 +404,7 @@ namespace Bololens
         {
             BotDebug.Log("BotBrain: Captured picture - " + (e.Holograms ? "Holo" : "No Holo"));
 
-            networking.SendPicture(e.Holograms ? "picture" : "holoPicture", e.Buffer);
+            Networking.SendPicture(e.Holograms ? "picture" : "holoPicture", e.Buffer);
             WaitForNextMessage();
         }
 
@@ -415,7 +413,7 @@ namespace Bololens
         /// </summary>
         private void WaitForNextMessage()
         {
-            materialisation.ShowFeedback("Thinking\r\n...");
+            Materialisation.ShowFeedback("Thinking\r\n...");
             waitForNextMessage = true;
         }
 
@@ -455,7 +453,7 @@ namespace Bololens
 
             // Pop the latest message.
             var message = messagesToTreat.Dequeue();
-            materialisation.HideFeedback();
+            Materialisation.HideFeedback();
 
             // Compute new feeling.
             CombineFeeling(message.Feeling, message.FeelingQuantity);
@@ -463,7 +461,7 @@ namespace Bololens
             // Show results.
             ShowPicture(message.Texture);
             ShowText(message.Text);
-            
+
             // TODO. Deals with more result types like prompt and cards.
         }
 
@@ -474,8 +472,8 @@ namespace Bololens
         /// <param name="quantity">The quantity.</param>
         private void CombineFeeling(Emotions emotions, float quantity)
         {
-            currentFeeling = personality.CombineFeeling(emotions, quantity);
-            memory.Save(BOTFEELINGSMEMORYKEY, personality.GetFeelings());
+            currentFeeling = Personality.CombineFeeling(emotions, quantity);
+            Memory.Save(BOTFEELINGSMEMORYKEY, Personality.GetFeelings());
         }
 
         /// <summary>
@@ -484,7 +482,7 @@ namespace Bololens
         /// <param name="texture">The picture.</param>
         private void ShowPicture(Texture texture)
         {
-            materialisation.ShowPicture(texture, currentFeeling);
+            Materialisation.ShowPicture(texture, currentFeeling);
         }
 
         /// <summary>
@@ -496,14 +494,14 @@ namespace Bololens
             // Speak out loud.
             if (!string.IsNullOrEmpty(text))
             {
-                speech.ConvertTextToSpeech(text, currentFeeling);
+                Speech.ConvertTextToSpeech(text, currentFeeling);
             }
             else
             {
                 EmptyMessageQueueAndListen();
             }
 
-            materialisation.ShowText(text, currentFeeling);
+            Materialisation.ShowText(text, currentFeeling);
         }
 
         /// <summary>
@@ -522,7 +520,7 @@ namespace Bololens
             }
             else
             {
-                materialisation.PlaySound(e.AudioClip, EmptyMessageQueueAndListen);
+                Materialisation.PlaySound(e.AudioClip, EmptyMessageQueueAndListen);
             }
         }
 
@@ -537,37 +535,37 @@ namespace Bololens
             }
             else
             {
-                hearing.ListenForDictation();
+                Hearing.ListenForDictation();
             }
         }
 
         /// <summary>
         /// Called when the component is destroyed by Unity.
         /// </summary>
-        void OnDestroy()
+        protected void OnDestroy()
         {
-            if (networking != null)
+            if (Networking != null)
             {
-                networking.StopReadingMessages();
-                networking.OnMessageReceived -= Networking_OnMessageReceived;
+                Networking.StopReadingMessages();
+                Networking.OnMessageReceived -= Networking_OnMessageReceived;
             }
 
-            if (hearing != null)
+            if (Hearing != null)
             {
-                hearing.OnDictationTimeout -= Hearing_OnDictationTimeout;
-                hearing.OnDictationResult -= Hearing_OnDictationResult;
-                hearing.OnKeywordDetected -= Hearing_OnKeywordDetected;
+                Hearing.OnDictationTimeout -= Hearing_OnDictationTimeout;
+                Hearing.OnDictationResult -= Hearing_OnDictationResult;
+                Hearing.OnKeywordDetected -= Hearing_OnKeywordDetected;
             }
 
-            if (speech != null)
+            if (Speech != null)
             {
-                speech.OnTextToSpeechResult -= Speech_OnTextToSpeechResult;
+                Speech.OnTextToSpeechResult -= Speech_OnTextToSpeechResult;
             }
 
-            if (sight != null)
+            if (Sight != null)
             {
-                sight.OnCapturedPicture -= Sight_OnCapturedPicture;
-                sight.OnCapturedPictureError -= Sight_OnCapturedPictureError;
+                Sight.OnCapturedPicture -= Sight_OnCapturedPicture;
+                Sight.OnCapturedPictureError -= Sight_OnCapturedPictureError;
             }
         }
     }

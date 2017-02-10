@@ -25,7 +25,7 @@ namespace Bololens.Networking
             public string EventType;
 
             [Tooltip("The UnityEvent to be invoked when the event type is recognized.")]
-            public UnityEvent<string> Callback;
+            public UnityEvent Callback;
         }
 
         [Tooltip("An array of string event type and UnityEvents, to be set in the Inspector.")]

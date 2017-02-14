@@ -10,7 +10,6 @@ using Bololens.Personality;
 using Bololens.Memory;
 using System.Collections.Generic;
 using Bololens.Core;
-using UnityEditor;
 
 namespace Bololens
 {

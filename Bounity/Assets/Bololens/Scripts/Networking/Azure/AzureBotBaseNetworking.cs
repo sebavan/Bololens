@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
-using WebSocketSharp;
 using Bololens.Core;
 
 namespace Bololens.Networking.Azure

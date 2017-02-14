@@ -4,7 +4,13 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.Networking;
+
+#if UNITY_EDITOR
 using WebSocketSharp;
+#elif UNITY_WSA
+    using Windows.Networking.Sockets;
+    using Windows.Storage.Streams;
+#endif
 
 namespace Bololens.Networking.Azure
 {
@@ -16,10 +22,18 @@ namespace Bololens.Networking.Azure
     /// <seealso cref="Bololens.Networking.AzureBotWebSocketNetworking" />
     public class AzureBotWebSocketNetworking : AzureBotBaseNetworking
     {
+
+#if UNITY_EDITOR
         /// <summary>
         /// The web socket in use to receive messages if the communication allows it.
         /// </summary>
         private WebSocket WebSocket;
+#elif UNITY_WSA
+        /// <summary>
+        /// The web socket in use to receive messages if the communication allows it.
+        /// </summary>
+        private MessageWebSocket WebSocket;
+#endif
 
         /// <summary>
         /// The latest received unprocessed web socket data.
@@ -53,6 +67,7 @@ namespace Bololens.Networking.Azure
             return null;
         }
 
+#if UNITY_EDITOR
         /// <summary>
         /// Starts the web socket listener.
         /// </summary>
@@ -89,31 +104,7 @@ namespace Bololens.Networking.Azure
             WebSocket.OnClose -= WebSocket_OnClose;
             WebSocket.OnError -= WebSocket_OnError;
 
-            // Retry to connect on close.
-            currentWebSocketData.Clear();
-
-            if (!IsConversationOver)
-            {
-                var request = UnityWebRequest.Get(CONNECTORSERVICECONVERSATIONURL + "/" + conversationId);
-
-                StartCoroutine(ExecuteRequest(request, OnWebSocketRetry, true));
-            }
-        }
-
-        /// <summary>
-        /// This is called when a a result has been received on an attempt to retry to the websocket.
-        /// </summary>
-        /// <param name="message">The text result of the request.</param>
-        /// <param name="request">The request.</param>
-        /// <returns>
-        /// An Enumerator to allow coroutines to carry on.
-        /// </returns>
-        private IEnumerator OnWebSocketRetry(string message, UnityWebRequest request)
-        {
-            var conversation = JsonConvert.DeserializeObject<Conversation>(message);
-            streamUrl = conversation.StreamUrl;
-            StartWebSocketListener();
-            return null;
+            Retry();
         }
 
         /// <summary>
@@ -139,6 +130,100 @@ namespace Bololens.Networking.Azure
                     currentWebSocketData.Enqueue(e.Data);
                 }
             }
+        }
+#elif UNITY_WSA
+        /// <summary>
+        /// Starts the web socket listener.
+        /// </summary>
+        private async void StartWebSocketListener()
+        {
+            BotDebug.Log("AzureBotNetworking: WebSocket: " + streamUrl);
+
+            WebSocket = new MessageWebSocket();
+
+            //In this case we will be sending/receiving a string so we need to set the MessageType to Utf8.
+            WebSocket.Control.MessageType = SocketMessageType.Utf8;
+
+            WebSocket.MessageReceived += WebSocket_OnMessage;
+            WebSocket.Closed += WebSocket_OnClose;
+
+            Uri serverUri = new Uri(streamUrl);
+            await WebSocket.ConnectAsync(serverUri);
+        }
+
+        /// <summary>
+        /// Handles the OnClose event of the WebSocket.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="CloseEventArgs"/> instance containing the event data.</param>
+        private void WebSocket_OnClose(IWebSocket sender, WebSocketClosedEventArgs e)
+        {
+            WebSocket.Closed -= WebSocket_OnClose;
+            WebSocket.MessageReceived -= WebSocket_OnMessage;
+
+            Retry();
+        }
+
+        /// <summary>
+        /// Handles the OnMessage event of the WebSocket.
+        /// </summary>
+        /// <param name="sender">The source of the event.</param>
+        /// <param name="e">The <see cref="MessageWebSocketMessageReceivedEventArgs"/> instance containing the event data.</param>
+        private void WebSocket_OnMessage(IWebSocket sender, MessageWebSocketMessageReceivedEventArgs e)
+        {
+            DataReader messageReader = e.GetDataReader();
+            BotDebug.LogFormat("AzureBotNetworking: WebSocket: receives message - Length/{0}", messageReader.UnconsumedBufferLength);
+
+            messageReader.UnicodeEncoding = UnicodeEncoding.Utf8;
+            string messageString = messageReader.ReadString(messageReader.UnconsumedBufferLength);
+
+            // Bot Messages are always string.
+            if (!string.IsNullOrEmpty(messageString))
+            {
+                if (messageString.IndexOf("\"type\": \"endOfConversation\"") > 0)
+                {
+                    BotDebug.LogFormat("AzureBotNetworking: WebSocket: EndOfConversation.");
+                    isConversationOver = true;
+                    WebSocket.Close(0, "EndOfConversation");
+                }
+                else
+                {
+                    currentWebSocketData.Enqueue(messageString);
+                }
+            }
+        }
+#endif
+
+        /// <summary>
+        /// Retries to connect to the web socket.
+        /// </summary>
+        public void Retry()
+        {
+            // Retry to connect on close.
+            currentWebSocketData.Clear();
+
+            if (!IsConversationOver)
+            {
+                var request = UnityWebRequest.Get(CONNECTORSERVICECONVERSATIONURL + "/" + conversationId);
+
+                StartCoroutine(ExecuteRequest(request, OnWebSocketRetry, true));
+            }
+        }
+
+        /// <summary>
+        /// This is called when a a result has been received on an attempt to retry to the websocket.
+        /// </summary>
+        /// <param name="message">The text result of the request.</param>
+        /// <param name="request">The request.</param>
+        /// <returns>
+        /// An Enumerator to allow coroutines to carry on.
+        /// </returns>
+        private IEnumerator OnWebSocketRetry(string message, UnityWebRequest request)
+        {
+            var conversation = JsonConvert.DeserializeObject<Conversation>(message);
+            streamUrl = conversation.StreamUrl;
+            StartWebSocketListener();
+            return null;
         }
 
         /// <summary>
@@ -189,9 +274,14 @@ namespace Bololens.Networking.Azure
         {
             if (WebSocket != null)
             {
+#if UNITY_EDITOR
                 WebSocket.OnMessage -= WebSocket_OnMessage;
-                WebSocket.OnClose -= WebSocket_OnClose;
                 WebSocket.OnError -= WebSocket_OnError;
+                WebSocket.OnClose -= WebSocket_OnClose;
+#elif UNITY_WSA
+                WebSocket.Closed -= WebSocket_OnClose;
+                WebSocket.MessageReceived -= WebSocket_OnMessage;
+#endif
             }
         }
     }

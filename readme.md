@@ -4,7 +4,7 @@ Bololens
 ## Summary
 **Bot + Hololens = Bololens**
 
-This repo provides a nice and easy integration of Chat Bot Clients in Unity application targetting UWP platforms. It is mainly developped for Hololens integration.
+This repo provides a nice and easy integration of Chat Bot Clients in Unity application targeting UWP platforms. It is mainly developed for Hololens integration.
 
 As bots and Conversation as a Platform are addressing a new way of interacting through Natural UI, it sounds obvious that bots could have a Digital Identity and Representation. What could be better than Mixed Reality to address the issue? 
 
